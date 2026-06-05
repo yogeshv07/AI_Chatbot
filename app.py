@@ -31,7 +31,6 @@ MODEL_LABELS = {
     "deepseek/deepseek-chat": "DeepSeek Chat",
     "meta-llama/llama-3.3-70b-instruct": "Llama 3.3",
     "qwen/qwen3-32b": "Qwen 3",
-    "x-ai/grok-3-mini": "Grok",
 }
 
 
