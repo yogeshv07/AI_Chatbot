@@ -1,11 +1,22 @@
 from flask import Flask, render_template, request
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
-app = Flask(__name__)
+# Load environment variables
+load_dotenv()
 
-genai.configure(api_key="AQ.Ab8RN6KaONFd_vrP07hQd0WxGXOawZfTcY8oY3sMC-GbfrL3pw")
+# Get API key from .env file
+api_key = os.getenv("GEMINI_API_KEY")
 
+# Configure Gemini
+genai.configure(api_key=api_key)
+
+# Create model
 model = genai.GenerativeModel("gemini-2.5-flash")
+
+# Create Flask app
+app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -13,11 +24,15 @@ def home():
     answer = ""
 
     if request.method == "POST":
+
         question = request.form["question"]
 
-        response = model.generate_content(question)
+        try:
+            response = model.generate_content(question)
+            answer = response.text
 
-        answer = response.text
+        except Exception as e:
+            answer = f"Error: {str(e)}"
 
     return render_template(
         "index.html",
