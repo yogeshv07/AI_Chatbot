@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from datetime import datetime
+from flask import Flask, redirect, render_template, request, session, url_for
 import google.generativeai as genai
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -22,50 +23,85 @@ openrouter_client = OpenAI(
 )
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
+
+MODEL_LABELS = {
+    "gemini": "Gemini 2.5 Flash",
+    "openai/gpt-4o-mini": "GPT",
+    "deepseek/deepseek-chat": "DeepSeek Chat",
+    "meta-llama/llama-3.3-70b-instruct": "Llama 3.3",
+    "qwen/qwen3-32b": "Qwen 3",
+    "x-ai/grok-3-mini": "Grok",
+}
+
+
+def get_ai_answer(question, selected_model):
+    if selected_model == "gemini":
+        response = gemini_model.generate_content(question)
+        return response.text
+
+    response = openrouter_client.chat.completions.create(
+        model=selected_model,
+        messages=[
+            {
+                "role": "user",
+                "content": question
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+
+
+def now_label():
+    return datetime.now().strftime("%I:%M %p").lstrip("0")
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
 
-    answer = ""
-    question = ""
-    selected_model = "Gemini 2.5 Flash"
+    selected_model = session.get("selected_model", "gemini")
+    messages = session.get("messages", [])
 
     if request.method == "POST":
 
-        question = request.form["question"]
-        selected_model = request.form["model"]
+        question = request.form.get("question", "").strip()
+        selected_model = request.form.get("model", "gemini")
+        session["selected_model"] = selected_model
 
-        try:
+        if question:
+            messages.append({
+                "role": "user",
+                "content": question,
+                "time": now_label()
+            })
 
-            if selected_model == "gemini":
+            try:
+                answer = get_ai_answer(question, selected_model)
+            except Exception as e:
+                answer = str(e)
 
-                response = gemini_model.generate_content(question)
-                answer = response.text
+            messages.append({
+                "role": "ai",
+                "content": answer,
+                "model": MODEL_LABELS.get(selected_model, selected_model),
+                "time": now_label()
+            })
 
-                selected_model = "Gemini 2.5 Flash"
-
-            else:
-
-                response = openrouter_client.chat.completions.create(
-                    model=selected_model,
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": question
-                        }
-                    ]
-                )
-
-                answer = response.choices[0].message.content
-
-        except Exception as e:
-            answer = str(e)
+            session["messages"] = messages
 
     return render_template(
         "index.html",
-        answer=answer,
-        question=question,
+        messages=messages,
+        model_labels=MODEL_LABELS,
         selected_model=selected_model
     )
+
+
+@app.route("/new-chat", methods=["POST"])
+def new_chat():
+    session["messages"] = []
+    return redirect(url_for("home"))
 
 if __name__ == "__main__":
 

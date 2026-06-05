@@ -52,6 +52,7 @@ body{
     border-radius:12px;
     line-height:1.7;
     word-wrap:break-word;
+    white-space:pre-wrap;
 }
 
 .user{
@@ -128,6 +129,16 @@ button:hover{
     margin-bottom:10px;
 }
 
+@media (max-width:700px){
+    form{
+        flex-direction:column;
+    }
+
+    .message{
+        max-width:100%;
+    }
+}
+
 </style>
 </head>
 
@@ -136,26 +147,28 @@ button:hover{
 <div class="chat-container">
 
     <div class="header">
-        🤖 AI Multi Model Chatbot
+        AI Multi Model Chatbot
     </div>
 
-    <div class="chat-box">
+    <div class="chat-box" id="chat-box">
 
-        {% if question %}
+        {% if messages %}
 
-        <div class="message user">
-            {{ question }}
-        </div>
+            {% for message in messages %}
 
-        <div class="message ai">
+                <div class="message {{ message.role }}">
 
-            <div class="model-name">
-                {{ selected_model }}
-            </div>
+                    {% if message.role == "ai" %}
+                        <div class="model-name">
+                            {{ message.model }}
+                        </div>
+                    {% endif %}
 
-            {{ answer }}
+                    {{ message.content }}
 
-        </div>
+                </div>
+
+            {% endfor %}
 
         {% else %}
 
@@ -175,20 +188,20 @@ button:hover{
 
             <select name="model">
 
-                <option value="gemini">
-                    Gemini 2.5 Flash
+                <option value="gemini" {% if selected_model == "gemini" %}selected{% endif %}>
+                    {{ model_labels["gemini"] }}
                 </option>
 
-                <option value="deepseek/deepseek-chat">
-                    DeepSeek Chat
+                <option value="deepseek/deepseek-chat" {% if selected_model == "deepseek/deepseek-chat" %}selected{% endif %}>
+                    {{ model_labels["deepseek/deepseek-chat"] }}
                 </option>
 
-                <option value="meta-llama/llama-3.3-70b-instruct">
-                    Llama 3.3
+                <option value="meta-llama/llama-3.3-70b-instruct" {% if selected_model == "meta-llama/llama-3.3-70b-instruct" %}selected{% endif %}>
+                    {{ model_labels["meta-llama/llama-3.3-70b-instruct"] }}
                 </option>
 
-                <option value="qwen/qwen3-32b">
-                    Qwen 3
+                <option value="qwen/qwen3-32b" {% if selected_model == "qwen/qwen3-32b" %}selected{% endif %}>
+                    {{ model_labels["qwen/qwen3-32b"] }}
                 </option>
 
             </select>
@@ -197,6 +210,7 @@ button:hover{
                 type="text"
                 name="question"
                 placeholder="Message AI Assistant..."
+                autocomplete="off"
                 required>
 
             <button type="submit">
@@ -208,6 +222,11 @@ button:hover{
     </div>
 
 </div>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+chatBox.scrollTop = chatBox.scrollHeight;
+</script>
 
 </body>
 </html>
