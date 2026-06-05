@@ -36,7 +36,8 @@ def home():
 
     return render_template(
         "index.html",
-        answer=answer
+        answer=answer,
+        question=question if request.method == "POST" else ""
     )
 
 if __name__ == "__main__":
