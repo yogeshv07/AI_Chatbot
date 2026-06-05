@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AI Chatbot</title>
 
 <style>
@@ -49,7 +50,8 @@ body{
     max-width:80%;
     padding:15px;
     border-radius:12px;
-    line-height:1.6;
+    line-height:1.7;
+    word-wrap:break-word;
 }
 
 .user{
@@ -70,6 +72,20 @@ body{
 form{
     display:flex;
     gap:10px;
+}
+
+select{
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#2f2f2f;
+    color:white;
+    cursor:pointer;
+    min-width:180px;
+}
+
+select:focus{
+    outline:none;
 }
 
 input{
@@ -103,39 +119,79 @@ button:hover{
 .placeholder{
     text-align:center;
     color:#aaa;
-    margin-top:100px;
+    margin-top:120px;
+}
+
+.model-name{
+    color:#10a37f;
+    font-weight:bold;
+    margin-bottom:10px;
 }
 
 </style>
 </head>
+
 <body>
 
 <div class="chat-container">
 
     <div class="header">
-        🤖 AI Assistant
+        🤖 AI Multi Model Chatbot
     </div>
 
     <div class="chat-box">
 
         {% if question %}
+
         <div class="message user">
             {{ question }}
         </div>
 
         <div class="message ai">
+
+            <div class="model-name">
+                {{ selected_model }}
+            </div>
+
             {{ answer }}
+
         </div>
+
         {% else %}
+
         <div class="placeholder">
-            Ask anything to start chatting...
+            <h2>Welcome</h2>
+            <br>
+            Choose a model and start chatting.
         </div>
+
         {% endif %}
 
     </div>
 
     <div class="input-area">
+
         <form method="POST">
+
+            <select name="model">
+
+                <option value="gemini">
+                    Gemini 2.5 Flash
+                </option>
+
+                <option value="deepseek/deepseek-chat">
+                    DeepSeek Chat
+                </option>
+
+                <option value="meta-llama/llama-3.3-70b-instruct">
+                    Llama 3.3
+                </option>
+
+                <option value="qwen/qwen3-32b">
+                    Qwen 3
+                </option>
+
+            </select>
 
             <input
                 type="text"
@@ -148,6 +204,7 @@ button:hover{
             </button>
 
         </form>
+
     </div>
 
 </div>
