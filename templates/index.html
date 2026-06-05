@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Assistant</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    width:500px;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#333;
+    margin-bottom:20px;
+}
+
+form{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#0078ff;
+}
+
+button{
+    padding:12px 20px;
+    background:#0078ff;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#005fd1;
+}
+
+.answer-box{
+    margin-top:20px;
+    padding:15px;
+    background:#f8f9fa;
+    border-radius:10px;
+    border-left:4px solid #0078ff;
+    min-height:80px;
+}
+
+.answer-title{
+    font-weight:bold;
+    margin-bottom:10px;
+    color:#333;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🤖 AI Assistant</h1>
+
+    <form method="POST">
+
+        <input
+            type="text"
+            name="question"
+            placeholder="Ask me anything..."
+            required>
+
+        <button type="submit">
+            Ask
+        </button>
+
+    </form>
+
+    <div class="answer-box">
+
+        <div class="answer-title">
+            Response
+        </div>
+
+        <p>{{ answer }}</p>
+
+    </div>
+
+</div>
+
+</body>
+</html>
