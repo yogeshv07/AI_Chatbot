@@ -8,26 +8,30 @@
 <style>
 :root{
     --bg:#0f172a;
-    --surface:#111827;
-    --surface-soft:#1f2937;
+    --panel:#111827;
+    --panel-soft:#1f2937;
     --text:#f8fafc;
     --muted:#94a3b8;
-    --line:rgba(148,163,184,.18);
+    --border:#253044;
     --accent:#10a37f;
-    --accent-dark:#0d8f6f;
-    --bubble-user:#10a37f;
-    --shadow:0 24px 80px rgba(2,6,23,.42);
+    --accent-hover:#0d8f6f;
+    --user:#10a37f;
+    --assistant:#111827;
+    --composer:#111827;
+    --shadow:0 18px 50px rgba(2,6,23,.35);
     color-scheme:dark;
 }
 
 [data-theme="light"]{
     --bg:#ffffff;
-    --surface:#f8fafc;
-    --surface-soft:#eef2f7;
+    --panel:#ffffff;
+    --panel-soft:#f7f7f8;
     --text:#0f172a;
-    --muted:#64748b;
-    --line:rgba(15,23,42,.12);
-    --shadow:0 24px 70px rgba(15,23,42,.12);
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --assistant:#f7f7f8;
+    --composer:#ffffff;
+    --shadow:0 18px 45px rgba(15,23,42,.10);
     color-scheme:light;
 }
 
@@ -43,16 +47,15 @@ body{
 body{
     margin:0;
     overflow:hidden;
-    background:
-        radial-gradient(circle at top, rgba(16,163,127,.18), transparent 34rem),
-        linear-gradient(135deg, var(--bg), var(--surface));
+    background:var(--bg);
     color:var(--text);
     font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    transition:background .2s ease, color .2s ease;
 }
 
 button,
-textarea,
-select{
+select,
+textarea{
     font:inherit;
 }
 
@@ -61,63 +64,69 @@ button{
 }
 
 .app{
-    display:grid;
-    grid-template-rows:auto minmax(0, 1fr) auto;
+    display:flex;
+    flex-direction:column;
     height:100vh;
-    max-width:1040px;
-    margin:0 auto;
-    padding:18px;
+    height:100dvh;
+    background:var(--bg);
+    overflow:hidden;
 }
 
 .topbar{
+    position:relative;
+    z-index:3;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:14px;
-    padding:12px;
-    border:1px solid var(--line);
-    border-radius:22px;
-    background:rgba(17,24,39,.74);
-    box-shadow:var(--shadow);
-    backdrop-filter:blur(18px);
-}
-
-[data-theme="light"] .topbar,
-[data-theme="light"] .composer{
-    background:rgba(255,255,255,.82);
+    min-height:64px;
+    padding:10px 18px;
+    border-bottom:1px solid var(--border);
+    background:color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter:blur(16px);
+    flex:0 0 auto;
 }
 
 .brand{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:11px;
     min-width:0;
 }
 
-.logo{
+.logo,
+.avatar{
     display:grid;
     place-items:center;
-    width:44px;
-    height:44px;
-    flex:0 0 44px;
-    border-radius:16px;
     color:white;
-    background:linear-gradient(135deg, var(--accent), #38d9af);
-    box-shadow:0 14px 32px rgba(16,163,127,.28);
-    font-size:23px;
-    font-weight:900;
+    font-weight:800;
 }
 
-.brand h1{
+.logo{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--accent), #2dd4bf);
+    box-shadow:0 10px 26px rgba(16,163,127,.24);
+    font-size:21px;
+}
+
+.brand-text{
+    min-width:0;
+}
+
+.brand-text h1{
     margin:0;
-    font-size:18px;
-    line-height:1.1;
+    font-size:17px;
+    line-height:1.15;
+    letter-spacing:0;
 }
 
-.brand p{
-    margin:4px 0 0;
+.brand-text p{
+    margin:3px 0 0;
     color:var(--muted);
-    font-size:13px;
+    font-size:12px;
 }
 
 .controls{
@@ -126,77 +135,114 @@ button{
     gap:10px;
 }
 
-.model-select,
-.theme-button{
-    height:42px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    color:var(--text);
-    background:rgba(148,163,184,.1);
-    outline:0;
-}
-
 .model-select{
-    min-width:190px;
-    padding:0 12px;
+    height:40px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    color:var(--text);
+    background:var(--panel-soft);
+    padding:0 36px 0 14px;
     cursor:pointer;
+    font-size:14px;
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:16px;
+    outline:none;
+    transition:border-color 0.16s ease, background-color 0.16s ease;
 }
 
-.theme-button{
-    width:42px;
-    cursor:pointer;
-    transition:transform .18s ease, background .18s ease;
+.model-select:hover {
+    border-color:var(--muted);
+    background-color:var(--border);
 }
 
-.theme-button:hover,
-.send-button:hover{
+.theme-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    min-width:40px;
+    padding:0;
+    border:1px solid var(--border);
+    border-radius:12px;
+    color:var(--text);
+    background:var(--panel-soft);
+    cursor:pointer;
+    transition:background .16s ease, transform .16s ease, border-color .16s ease;
+}
+
+.theme-toggle:hover{
+    background:var(--border);
+    border-color:var(--muted);
     transform:translateY(-1px);
 }
 
+.theme-toggle svg {
+    width:20px;
+    height:20px;
+    stroke:currentColor;
+    display:none;
+}
+
+[data-theme="dark"] .theme-toggle .icon-sun {
+    display:block;
+}
+
+[data-theme="light"] .theme-toggle .icon-moon {
+    display:block;
+}
+
 .chat{
-    overflow:auto;
-    padding:28px 4px 150px;
+    flex:1 1 0%;
+    overflow-y:auto;
     scroll-behavior:smooth;
+    background:var(--bg);
+}
+
+.chat-inner{
+    display:flex;
+    flex-direction:column;
+    width:min(100%, 900px);
+    min-height:100%;
+    margin:0 auto;
+    padding:32px 18px 24px;
 }
 
 .empty{
     display:grid;
     place-items:center;
-    min-height:100%;
+    flex:1;
+    min-height:0;
     text-align:center;
-    animation:fadeUp .32s ease both;
 }
 
-.empty-card{
+.empty-content{
     max-width:560px;
-    padding:34px;
-    border:1px solid var(--line);
-    border-radius:24px;
-    background:rgba(17,24,39,.58);
-    box-shadow:var(--shadow);
-    backdrop-filter:blur(18px);
-}
-
-[data-theme="light"] .empty-card{
-    background:rgba(255,255,255,.72);
 }
 
 .empty .logo{
-    margin:0 auto 18px;
-    width:58px;
-    height:58px;
-    border-radius:20px;
-    font-size:31px;
+    width:62px;
+    height:62px;
+    margin:0 auto 20px;
+    border-radius:18px;
+    font-size:34px;
 }
 
 .empty h2{
     margin:0;
     font-size:34px;
+    font-weight:700;
     letter-spacing:0;
 }
 
 .empty p{
-    margin:12px 0 0;
+    margin:12px auto 0;
+    max-width:430px;
     color:var(--muted);
     font-size:16px;
     line-height:1.6;
@@ -204,46 +250,61 @@ button{
 
 .messages{
     display:grid;
-    gap:20px;
+    gap:22px;
 }
 
 .message{
     display:flex;
     align-items:flex-start;
     gap:12px;
-    animation:messageIn .24s ease both;
+    animation:messageIn .22s ease both;
 }
 
 .message.user{
-    flex-direction:row-reverse;
+    justify-content:flex-end;
+}
+
+.message.user .avatar{
+    order:2;
 }
 
 .avatar{
-    display:grid;
-    place-items:center;
-    width:38px;
-    height:38px;
-    flex:0 0 38px;
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
     border-radius:50%;
-    color:white;
-    background:linear-gradient(135deg, #334155, var(--accent));
-    font-size:13px;
-    font-weight:800;
+    background:#374151;
+    font-size:12px;
 }
 
-.message-body{
+.message.user .avatar{
+    background:linear-gradient(135deg, var(--accent), var(--accent-hover));
+}
+
+.message.assistant .avatar,
+.message.ai .avatar{
+    background:#111827;
+    border:1px solid var(--border);
+}
+
+[data-theme="light"] .message.assistant .avatar,
+[data-theme="light"] .message.ai .avatar{
+    color:#0f172a;
+    background:#f3f4f6;
+}
+
+.message-main{
     display:grid;
     gap:7px;
-    max-width:min(76%, 780px);
+    max-width:min(78%, 720px);
 }
 
-.message.user .message-body{
+.message.user .message-main{
     justify-items:end;
 }
 
 .meta{
     display:flex;
-    align-items:center;
     gap:8px;
     color:var(--muted);
     font-size:12px;
@@ -256,24 +317,20 @@ button{
 .bubble{
     width:max-content;
     max-width:100%;
-    padding:15px 17px;
-    border:1px solid var(--line);
+    padding:14px 16px;
+    border:1px solid var(--border);
     border-radius:18px;
-    background:rgba(17,24,39,.72);
-    box-shadow:0 14px 36px rgba(2,6,23,.16);
+    background:var(--assistant);
     line-height:1.65;
     overflow:hidden;
-    backdrop-filter:blur(16px);
-}
-
-[data-theme="light"] .bubble{
-    background:rgba(255,255,255,.8);
+    word-break:break-word;
+    overflow-wrap:anywhere;
 }
 
 .message.user .bubble{
     color:white;
-    border-color:rgba(16,163,127,.3);
-    background:linear-gradient(135deg, var(--bubble-user), var(--accent-dark));
+    border-color:transparent;
+    background:linear-gradient(135deg, var(--accent), #0d9488);
 }
 
 .markdown > *:first-child{
@@ -295,33 +352,39 @@ button{
 }
 
 .markdown li{
-    margin:6px 0;
+    margin:5px 0;
+}
+
+.table-wrapper {
+    width:100%;
+    overflow-x:auto;
+    margin:12px 0;
+    border-radius:10px;
+    border:1px solid var(--border);
 }
 
 .markdown table{
     width:100%;
-    margin:12px 0;
+    margin:0;
     border-collapse:collapse;
-    overflow:hidden;
-    border-radius:12px;
 }
 
 .markdown th,
 .markdown td{
-    padding:10px 12px;
-    border:1px solid var(--line);
+    padding:9px 10px;
+    border:1px solid var(--border);
     text-align:left;
 }
 
 .markdown th{
-    background:rgba(16,163,127,.12);
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .code-shell{
     margin:12px 0;
     overflow:hidden;
-    border:1px solid var(--line);
-    border-radius:14px;
+    border:1px solid #263247;
+    border-radius:12px;
     background:#0b1220;
 }
 
@@ -330,7 +393,7 @@ button{
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    padding:9px 11px;
+    padding:8px 10px;
     color:#cbd5e1;
     background:#111827;
     font-size:12px;
@@ -338,8 +401,8 @@ button{
 
 .copy-code{
     padding:5px 8px;
-    border:1px solid rgba(148,163,184,.22);
-    border-radius:9px;
+    border:1px solid rgba(148,163,184,.24);
+    border-radius:8px;
     color:#e2e8f0;
     background:rgba(148,163,184,.12);
     cursor:pointer;
@@ -372,7 +435,7 @@ code{
     display:none;
     align-items:center;
     gap:5px;
-    padding:15px 17px;
+    width:auto;
 }
 
 .is-loading .typing{
@@ -395,30 +458,35 @@ code{
     animation-delay:.24s;
 }
 
-.composer-wrap{
-    position:fixed;
-    left:50%;
-    right:auto;
-    bottom:18px;
-    width:min(100% - 36px, 1040px);
-    transform:translateX(-50%);
+.composer-area{
+    flex:0 0 auto;
+    padding:16px 18px 18px;
+    background:var(--bg);
+    border-top:1px solid var(--border);
 }
 
 .composer{
-    border:1px solid var(--line);
-    border-radius:24px;
-    background:rgba(17,24,39,.88);
+    width:min(100%, 900px);
+    margin:0 auto;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:var(--composer);
     box-shadow:var(--shadow);
-    backdrop-filter:blur(20px);
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.composer:focus-within {
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 15%, transparent), var(--shadow);
 }
 
 .composer textarea{
     display:block;
     width:100%;
-    max-height:180px;
     min-height:58px;
+    max-height:180px;
     resize:none;
-    padding:18px 18px 8px;
+    padding:17px 18px 8px;
     border:0;
     outline:0;
     color:var(--text);
@@ -431,7 +499,7 @@ code{
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    padding:8px 10px 10px;
+    padding:7px 10px 10px 16px;
 }
 
 .hint{
@@ -439,25 +507,48 @@ code{
     font-size:12px;
 }
 
+.composer-buttons {
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
 .send-button,
 .stop-button{
     display:grid;
     place-items:center;
-    width:42px;
-    height:42px;
-    border-radius:14px;
+    width:38px;
+    height:38px;
+    padding:0;
+    border-radius:12px;
     color:white;
     cursor:pointer;
-    transition:transform .18s ease, opacity .18s ease;
+    transition:transform .16s ease, background .16s ease, opacity .16s ease;
+}
+
+.send-button svg,
+.stop-button svg {
+    width:18px;
+    height:18px;
 }
 
 .send-button{
-    background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+    background:var(--accent);
+}
+
+.send-button:hover{
+    background:var(--accent-hover);
+    transform:scale(1.04);
 }
 
 .stop-button{
     display:none;
     background:#ef4444;
+}
+
+.stop-button:hover {
+    background:#dc2626;
+    transform:scale(1.04);
 }
 
 .is-loading .send-button{
@@ -466,15 +557,6 @@ code{
 
 .is-loading .stop-button{
     display:grid;
-}
-
-.spinner{
-    width:16px;
-    height:16px;
-    border:2px solid rgba(248,250,252,.32);
-    border-top-color:white;
-    border-radius:50%;
-    animation:spin .8s linear infinite;
 }
 
 ::-webkit-scrollbar{
@@ -488,17 +570,12 @@ code{
 ::-webkit-scrollbar-thumb{
     border:3px solid transparent;
     border-radius:999px;
-    background:rgba(148,163,184,.48);
+    background:rgba(148,163,184,.55);
     background-clip:content-box;
 }
 
-@keyframes fadeUp{
-    from{opacity:0; transform:translateY(14px);}
-    to{opacity:1; transform:translateY(0);}
-}
-
 @keyframes messageIn{
-    from{opacity:0; transform:translateY(12px);}
+    from{opacity:0; transform:translateY(10px);}
     to{opacity:1; transform:translateY(0);}
 }
 
@@ -512,49 +589,108 @@ code{
 }
 
 @media (max-width:720px){
-    .app{
-        padding:10px;
-    }
-
     .topbar{
-        align-items:stretch;
-        flex-direction:column;
-        border-radius:18px;
+        padding:8px 12px;
+        min-height:56px;
+        gap:8px;
     }
 
-    .controls{
-        width:100%;
+    .brand{
+        gap:8px;
     }
 
-    .model-select{
-        flex:1;
-        min-width:0;
+    .logo{
+        width:32px;
+        height:32px;
+        flex:0 0 32px;
+        font-size:18px;
+        border-radius:9px;
     }
 
-    .brand p,
-    .hint{
+    .brand-text h1{
+        font-size:15px;
+    }
+
+    .brand-text p,
+    .hint,
+    .meta span{
         display:none;
     }
 
-    .chat{
-        padding:18px 0 144px;
+    .controls{
+        gap:6px;
     }
 
-    .message-body{
-        max-width:calc(100vw - 82px);
+    .model-select{
+        height:36px;
+        padding:0 28px 0 10px;
+        font-size:13px;
+        background-position:right 8px center;
+        background-size:12px;
+        min-width:auto;
+        max-width:130px;
     }
 
-    .empty-card{
-        padding:26px 18px;
+    .theme-toggle{
+        width:36px;
+        height:36px;
+        min-width:36px;
+        border-radius:10px;
+    }
+
+    .theme-toggle svg{
+        width:18px;
+        height:18px;
+    }
+
+    .chat-inner{
+        padding:16px 12px 16px;
+    }
+
+    .empty{
+        min-height:auto;
     }
 
     .empty h2{
-        font-size:28px;
+        font-size:24px;
     }
 
-    .composer-wrap{
-        bottom:10px;
-        width:calc(100% - 20px);
+    .empty p{
+        font-size:14px;
+    }
+
+    .message{
+        gap:8px;
+    }
+
+    .avatar{
+        width:28px;
+        height:28px;
+        flex-basis:28px;
+        font-size:10px;
+    }
+
+    .message-main{
+        max-width:calc(100vw - 68px);
+    }
+
+    .bubble{
+        padding:10px 12px;
+        border-radius:16px;
+        font-size:14px;
+    }
+
+    .composer-area{
+        padding:10px 10px 12px;
+    }
+
+    .composer{
+        border-radius:16px;
+    }
+
+    .composer textarea{
+        padding:12px 14px 6px;
+        min-height:44px;
     }
 }
 </style>
@@ -565,14 +701,24 @@ code{
     <header class="topbar">
         <div class="brand">
             <div class="logo" aria-label="Y logo">Y</div>
-            <div>
-                <h1>Yogesh </h1>
+            <div class="brand-text">
+                <h1>Y AI</h1>
                 <p>AI chatbot</p>
             </div>
         </div>
 
         <div class="controls">
-            <button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle theme">Sun</button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+                <!-- Sun icon (for dark mode, to switch to light) -->
+                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                </svg>
+                <!-- Moon icon (for light mode, to switch to dark) -->
+                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                </svg>
+            </button>
             <select class="model-select" form="chat-form" name="model" aria-label="Select AI model">
                 {% for model_id, model_name in model_labels.items() %}
                 <option value="{{ model_id }}" {% if selected_model == model_id %}selected{% endif %}>{{ model_name }}</option>
@@ -582,55 +728,66 @@ code{
     </header>
 
     <section class="chat" id="chat" aria-label="Chat conversation">
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <article class="message {{ message.role }}">
-                <div class="avatar">{% if message.role == "user" %}Y{% else %}AI{% endif %}</div>
-                <div class="message-body">
-                    <div class="meta">
-                        <strong>{% if message.role == "user" %}You{% else %}{{ message.model|default("AI") }}{% endif %}</strong>
-                        <span>{{ message.time|default("Now") }}</span>
+        <div class="chat-inner">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <article class="message {% if message.role == 'ai' %}assistant{% else %}{{ message.role }}{% endif %}">
+                    <div class="avatar">{% if message.role == "user" %}Y{% else %}AI{% endif %}</div>
+                    <div class="message-main">
+                        <div class="meta">
+                            <strong>{% if message.role == "user" %}You{% else %}{{ message.model|default("AI") }}{% endif %}</strong>
+                            <span>{{ message.time|default("Now") }}</span>
+                        </div>
+                        <div class="bubble markdown" data-markdown="{{ message.content|tojson|forceescape }}" data-stream="{% if loop.last and message.role == 'ai' %}true{% else %}false{% endif %}"></div>
                     </div>
-                    <div class="bubble markdown" data-markdown="{{ message.content|tojson|forceescape }}" data-stream="{% if loop.last and message.role == 'ai' %}true{% else %}false{% endif %}"></div>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty">
-            <div class="empty-card">
-                <div class="logo">Y</div>
-                <h2>Ask anything</h2>
-                <p>Select an AI model, type your message, and start chatting.</p>
+                </article>
+                {% endfor %}
             </div>
-        </div>
-        {% endif %}
-
-        <div class="messages">
-            <article class="message ai">
-                <div class="avatar">AI</div>
-                <div class="message-body">
-                    <div class="meta">
-                        <strong>AI</strong>
-                        <span>Thinking</span>
-                    </div>
-                    <div class="bubble typing" aria-label="AI is typing">
-                        <span></span><span></span><span></span>
-                    </div>
+            {% else %}
+            <div class="empty">
+                <div class="empty-content">
+                    <div class="logo">Y</div>
+                    <h2>How can I help you today?</h2>
+                    <p>Select a model, type your prompt, and start chatting.</p>
                 </div>
-            </article>
+            </div>
+            {% endif %}
+
+            <div class="messages">
+                <article class="message assistant">
+                    <div class="avatar">AI</div>
+                    <div class="message-main">
+                        <div class="meta">
+                            <strong>AI</strong>
+                            <span>Thinking</span>
+                        </div>
+                        <div class="bubble typing" aria-label="AI is typing">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </article>
+            </div>
         </div>
     </section>
 
-    <div class="composer-wrap">
+    <div class="composer-area">
         <form class="composer" id="chat-form" method="POST">
-            <textarea id="question" name="question" placeholder="Enter Your Prompt" autocomplete="off" rows="1" required></textarea>
+            <textarea id="question" name="question" placeholder="Message Y AI..." autocomplete="off" rows="1" required></textarea>
             <div class="composer-actions">
                 <span class="hint">Enter to send. Shift+Enter for new line.</span>
-                <div>
-                    <button class="stop-button" id="stop-button" type="button" aria-label="Stop response"><span class="spinner"></span></button>
-                    <button class="send-button" type="submit" aria-label="Send message">Send</button>
+                <div class="composer-buttons">
+                    <button class="stop-button" id="stop-button" type="button" aria-label="Stop response">
+                        <svg class="stop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                        </svg>
+                    </button>
+                    <button class="send-button" type="submit" aria-label="Send message">
+                        <svg class="send-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </form>
@@ -647,7 +804,6 @@ const stopButton = document.getElementById("stop-button");
 
 const savedTheme = localStorage.getItem("theme") || "dark";
 document.documentElement.dataset.theme = savedTheme;
-themeToggle.textContent = savedTheme === "dark" ? "Light" : "Dark";
 
 function escapeHtml(value){
     return value
@@ -679,7 +835,7 @@ function renderMarkdown(raw){
         const rows = match.trim().split("\n").filter(Boolean);
         const headers = rows[0].split("|").slice(1, -1).map(cell => cell.trim());
         const body = rows.slice(2).map(row => row.split("|").slice(1, -1).map(cell => cell.trim()));
-        return `<table><thead><tr>${headers.map(cell => `<th>${cell}</th>`).join("")}</tr></thead><tbody>${body.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+        return `<div class="table-wrapper"><table><thead><tr>${headers.map(cell => `<th>${cell}</th>`).join("")}</tr></thead><tbody>${body.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
     });
 
     text = text
@@ -735,7 +891,7 @@ function streamLatestMessage(){
             node.innerHTML = renderMarkdown(raw);
             scrollToBottom();
         }
-    }, 24);
+    }, 22);
 }
 
 function scrollToBottom(){
@@ -756,7 +912,6 @@ themeToggle.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     localStorage.setItem("theme", next);
-    themeToggle.textContent = next === "dark" ? "Light" : "Dark";
 });
 
 textarea.addEventListener("input", resizeTextarea);
